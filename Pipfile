@@ -17,6 +17,7 @@ safetensors = "*"
 librosa = "*"
 praat-parselmouth = "*"
 pyaudio = "*"
+datasets = "*"
 
 [dev-packages]
 bandit = "*"
