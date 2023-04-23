@@ -1,3 +1,5 @@
 __pycache__
 /hubert_base.pt
 /hubert_base/
+/build/
+*.egg-info/
