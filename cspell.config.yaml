@@ -1,0 +1,23 @@
+version: "0.2"
+ignorePaths: []
+dictionaryDefinitions: []
+dictionaries: []
+words:
+  - argmax
+  - esnya
+  - fmax
+  - fmin
+  - librosa
+  - Librosa
+  - liujing
+  - medfilt
+  - ndim
+  - parselmouth
+  - piptrack
+  - pyworld
+  - rint
+  - scipy
+  - stonemask
+  - unsqueeze
+ignoreWords: []
+import: []
