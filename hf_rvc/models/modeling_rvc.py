@@ -29,6 +29,8 @@ class RVCModel(PreTrainedModel):
 
         self.sid = torch.tensor([0], dtype=torch.long)
 
+        self.post_init()
+
     def forward(
         self,
         input_values: torch.Tensor,
@@ -46,3 +48,8 @@ class RVCModel(PreTrainedModel):
         )
 
         return output
+
+    def to(self, *args, **kwargs) -> "RVCModel":
+        model = super().to(*args, **kwargs)
+        model.sid = self.sid.to(*args, **kwargs)
+        return model

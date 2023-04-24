@@ -67,8 +67,10 @@ def unroll_mean(x, y, window):
 def realtime_vc(
     model: str | PathLike | RVCModel,
     feature_extractor: str | PathLike | RVCFeatureExtractor | None = None,
-    buffering_seconds: float = 0.1,
-    max_buffering_seconds: float | None = 1.0,
+    buffering_seconds: float = 0.5,
+    auto_latency: bool = False,
+    min_buffering_seconds: float = 0.1,
+    max_buffering_seconds: float = 1.0,
     padding_seconds: float = 0.1,
     f0_up_key: float = 0,
     f0_method: Literal["pm", "harvest"] = "pm",
@@ -76,6 +78,8 @@ def realtime_vc(
     output_device_index: int | None = None,
     output_sampling_rate: int = 48000,
     volume: float = 1.0,
+    device: str | torch.device = "cpu",
+    fp16: bool = False,
 ) -> None:
     """
     Real-time voice conversion.
@@ -86,13 +90,19 @@ def realtime_vc(
             Path to the feature extractor or the feature extractor itself.
             Defaults to None.
         buffering_seconds (float, optional): Buffering seconds. Defaults to 0.1.
-        max_buffering_seconds (float | None, optional): Maximum buffering seconds. Defaults to 1.0.
+        auto_latency (bool, optional): Automatically adjust latency. Defaults to False.
+        min_buffering_seconds (float | None, optional):
+            Minimum buffering seconds. Defaults to 0.1. used with auto_latency.
+        max_buffering_seconds (float | None, optional):
+            Maximum buffering seconds. Defaults to 1.0. used with auto_latency.
         padding_seconds (float, optional): Padding seconds. Defaults to 0.1.
         f0_up_key (float, optional): F0 up key. Defaults to 0.
         f0_method (Literal["pm", "harvest"], optional): F0 method. Defaults to "pm".
         input_device_index (int | None, optional): Input device index. Defaults to None.
         output_device_index (int | None, optional): Output device index. Defaults to None.
         volume (float, optional): Volume. Defaults to 1.0.
+        device (str | torch.device, optional): Device. Defaults to "cpu". "cuda" is recommended.
+        fp16 (bool, optional): Use fp16. Defaults to False.
     """
 
     if not isinstance(feature_extractor, RVCFeatureExtractor):
@@ -108,6 +118,10 @@ def realtime_vc(
     assert isinstance(feature_extractor, RVCFeatureExtractor)
     assert isinstance(model, RVCModel)
 
+    model = model.to(device)
+    if fp16:
+        model = model.half()
+
     feature_extractor.set_f0_method(f0_method)
 
     input_sampling_rate = feature_extractor.sampling_rate
@@ -115,7 +129,9 @@ def realtime_vc(
 
     f0_seconds = f0_window / input_sampling_rate
     f0_sampling_rate = input_sampling_rate / f0_window
-    min_buffering_frames = int(f0_sampling_rate * buffering_seconds) * f0_window
+    if min_buffering_seconds is None:
+        min_buffering_seconds = buffering_seconds
+    min_buffering_frames = int(f0_sampling_rate * min_buffering_seconds) * f0_window
     max_buffering_frames = (
         int(f0_sampling_rate * max_buffering_seconds) * f0_window
         if max_buffering_seconds
@@ -158,6 +174,9 @@ def realtime_vc(
     try:
         with torch.no_grad():
             while input_stream.is_active() and not stop_event.is_set():
+                if torch.cuda.is_available():
+                    torch.cuda.empty_cache()
+
                 input_audio = np.frombuffer(
                     input_stream.read(buffering_frames),
                     dtype=np.float32,
@@ -178,6 +197,9 @@ def realtime_vc(
                         f0_up_key=f0_up_key,
                         return_tensors="pt",
                     )
+                    if fp16:
+                        features = features.to(torch.float16)
+                    features = features.to(device)
 
                     output_frames = (
                         input_frames * output_sampling_rate // input_sampling_rate
@@ -189,6 +211,7 @@ def realtime_vc(
                     )
                     output = (
                         model(**features)
+                        .cpu()
                         .flatten()
                         .numpy()[
                             -int(output_frames + output_padding_frames) : -int(
@@ -201,27 +224,27 @@ def realtime_vc(
 
                     output_queue.put_nowait(output.tobytes())
 
-                buffering_seconds = buffering_frames / input_sampling_rate
-                if pc.elapsed >= buffering_seconds:
-                    buffering_frames = min(
-                        math.ceil(
-                            (pc.elapsed + f0_window / input_sampling_rate)
-                            * input_sampling_rate
-                            / f0_window
-                            + 1
+                if auto_latency:
+                    buffering_seconds = buffering_frames / input_sampling_rate
+                    if pc.elapsed >= buffering_seconds:
+                        buffering_frames = min(
+                            math.ceil(
+                                (pc.elapsed + f0_window / input_sampling_rate)
+                                * input_sampling_rate
+                                / f0_window
+                                + 1
+                            )
+                            * f0_window,
+                            max_buffering_frames,
                         )
-                        * f0_window,
-                        max_buffering_frames,
+                    elif pc.elapsed + 2 * f0_seconds < buffering_seconds:
+                        buffering_frames = max(
+                            buffering_frames - f0_window,
+                            min_buffering_frames,
+                        )
+                    print(
+                        f"latency: {buffering_frames / input_sampling_rate * 1000:4.0f}ms",
                     )
-                elif pc.elapsed + 2 * f0_seconds < buffering_seconds:
-                    buffering_frames = max(
-                        buffering_frames - f0_window,
-                        min_buffering_frames,
-                    )
-                print(
-                    f"latency: {buffering_frames / input_sampling_rate * 1000:4.0f}ms",
-                )
-
     finally:
         stop_event.set()
         input_stream.close()

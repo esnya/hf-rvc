@@ -17,7 +17,7 @@ def load_vits_checkpoint(vits_path: str | PathLike) -> dict[str, Any]:
 def extract_vits_config(
     vits_checkpoint: dict[str, Any],
 ) -> SynthesizerTrnMs256NSFsidConfig:
-    return SynthesizerTrnMs256NSFsidConfig(*vits_checkpoint["config"], is_half=False)
+    return SynthesizerTrnMs256NSFsidConfig(*vits_checkpoint["config"])
 
 
 def extract_vits_state(vits_checkpoint: dict[str, Any]) -> dict[str, Any]:
