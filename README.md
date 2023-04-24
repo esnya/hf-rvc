@@ -51,7 +51,7 @@ python -m hf_rvc --help
 
 For more detailed usage of each tool, you can check the --help option of the specific command.
 
-## Model Conversion
+### Model Conversion
 
 Since the models are not yet available on HuggingFace, you may need to convert the original `.pth` model files or the original `hubert_base.pt` model to be compatible with HF RVC. This can be done using the `convert-***` command line tools. The conversion not only adapts the models to the different frameworks but also, by default, ensures compatibility with the [safetensor](https://github.com/huggingface/safetensors) format for **secure** model sharing.
 
@@ -63,6 +63,21 @@ Example:
 python -m hf_rvc convert-rvc --hubert-path <path_to_hubert_base.pt> --unsafe <path_to_original_vits_model.pth>
 ```
 
+### Real-time Voice Conversion
+
+A real-time voice conversion tool that allows you to perform voice conversion on-the-fly. To use this feature, simply run the following command:
+
+```
+python -m hf_rvc realtime-vc path/to/converted_or_hugging_face/model
+```
+
+This tool accepts various arguments, including the model, feature extractor, buffering settings, F0 method, input and output device indices, and more. It enables users to adjust the conversion parameters in, offering greater control and customization.
+
+```
+python -m hf_rvc realtime-vc --help
+```
+
+For a detailed explanation of each argument, please run the `--help` command as shown above.
 
 ## Attribution
 

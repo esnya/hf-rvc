@@ -17,13 +17,17 @@ words:
   - nanmedian
   - nanmin
   - ndim
+  - numpy
   - parselmouth
   - piptrack
+  - Praat's
   - pyin
   - pyworld
   - rint
+  - safetensor
   - scipy
   - stonemask
   - unsqueeze
+  - wavfile
 ignoreWords: []
 import: []
