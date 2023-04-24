@@ -2,14 +2,14 @@ from os import PathLike
 from typing import Any
 
 import torch
-from fairseq import checkpoint_utils
-from fairseq.models.hubert.hubert import HubertModel
 from transformers import HubertConfig, HubertForCTC
 
 from ..utils.path import remove_extension
 
 
-def load_fairseq_hubert(model_path: str, unsafe: bool = False) -> HubertModel:
+def load_fairseq_hubert(model_path: str, unsafe: bool = False):
+    from fairseq import checkpoint_utils
+
     if not unsafe:
         raise ValueError(
             "Safe load failed. Re-running with `unsafe` set to `False`"
@@ -26,7 +26,7 @@ def load_fairseq_hubert(model_path: str, unsafe: bool = False) -> HubertModel:
     return fairseq_hubert
 
 
-def extract_hubert_config(fairseq_hubert: HubertModel) -> HubertConfig:
+def extract_hubert_config(fairseq_hubert) -> HubertConfig:
     assert isinstance(fairseq_hubert.final_proj, torch.nn.Linear)
 
     hf_hubert_config = HubertConfig(vocab_size=fairseq_hubert.final_proj.out_features)
@@ -35,7 +35,7 @@ def extract_hubert_config(fairseq_hubert: HubertModel) -> HubertConfig:
 
 
 def extract_hubert_state(
-    config_or_model: HubertConfig | HubertForCTC, fairseq_hubert: HubertModel
+    config_or_model: HubertConfig | HubertForCTC, fairseq_hubert
 ) -> dict[str, Any]:
     fairseq_state_dict = fairseq_hubert.state_dict()
     assert isinstance(fairseq_state_dict, dict)
@@ -104,7 +104,7 @@ def extract_hubert_state(
 
 
 def convert_hubert(
-    fairseq_hubert: HubertModel | str | PathLike = "./models/hubert_base.pt",
+    fairseq_hubert: Any | str | PathLike = "./models/hubert_base.pt",
     save_directory: str | PathLike | None = None,
     safe_serialization=True,
     unsafe: bool = False,
@@ -118,11 +118,14 @@ def convert_hubert(
         unsafe: Set to True to load untrusted models (default: False).
     """
 
+    from fairseq.models.hubert.hubert import HubertModel
+
     if not isinstance(fairseq_hubert, HubertModel):
         if save_directory is None:
             save_directory = remove_extension(str(fairseq_hubert))
 
         fairseq_hubert = load_fairseq_hubert(str(fairseq_hubert), unsafe=unsafe)
+    assert isinstance(fairseq_hubert, HubertModel)
     assert isinstance(fairseq_hubert.final_proj, torch.nn.Linear)
 
     hf_hubert_config = extract_hubert_config(fairseq_hubert)
