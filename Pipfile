@@ -18,6 +18,7 @@ argh = "*"
 safetensors = "*"
 fairseq = "*"
 librosa = "*"
+praat-parselmouth = "*"
 
 [dev-packages]
 bandit = "*"
