@@ -19,6 +19,7 @@ safetensors = "*"
 fairseq = "*"
 librosa = "*"
 praat-parselmouth = "*"
+pyaudio = "*"
 
 [dev-packages]
 bandit = "*"
