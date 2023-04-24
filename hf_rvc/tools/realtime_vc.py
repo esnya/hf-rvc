@@ -76,7 +76,25 @@ def realtime_vc(
     output_device_index: int | None = None,
     output_sampling_rate: int = 48000,
     volume: float = 1.0,
-):
+) -> None:
+    """
+    Real-time voice conversion.
+
+    Args:
+        model (str | PathLike | RVCModel): Path to the model or the model itself.
+        feature_extractor (str | PathLike | RVCFeatureExtractor | None, optional):
+            Path to the feature extractor or the feature extractor itself.
+            Defaults to None.
+        buffering_seconds (float, optional): Buffering seconds. Defaults to 0.1.
+        max_buffering_seconds (float | None, optional): Maximum buffering seconds. Defaults to 1.0.
+        padding_seconds (float, optional): Padding seconds. Defaults to 0.1.
+        f0_up_key (float, optional): F0 up key. Defaults to 0.
+        f0_method (Literal["pm", "harvest"], optional): F0 method. Defaults to "pm".
+        input_device_index (int | None, optional): Input device index. Defaults to None.
+        output_device_index (int | None, optional): Output device index. Defaults to None.
+        volume (float, optional): Volume. Defaults to 1.0.
+    """
+
     if not isinstance(feature_extractor, RVCFeatureExtractor):
         if feature_extractor is None:
             if isinstance(model, RVCModel):
