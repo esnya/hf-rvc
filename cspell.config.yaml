@@ -9,11 +9,17 @@ words:
   - fmin
   - librosa
   - Librosa
+  - linspace
   - liujing
   - medfilt
+  - nanmax
+  - nanmean
+  - nanmedian
+  - nanmin
   - ndim
   - parselmouth
   - piptrack
+  - pyin
   - pyworld
   - rint
   - scipy

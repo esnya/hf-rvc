@@ -17,7 +17,7 @@ def extract_f0_pm(
 
     sound = parselmouth.Sound(audio, sampling_rate)
     res = sound.to_pitch_ac(
-        time_step=time_step / 1000,
+        time_step=time_step,
         voicing_threshold=0.6,
         pitch_floor=f0_min,
         pitch_ceiling=f0_max,
@@ -47,23 +47,51 @@ def extract_f0_harvest(
     return f0
 
 
-def extract_f0_librosa(
+def extract_f0_yin(
     audio: np.ndarray,
     sampling_rate: int,
     time_step: float,
     f0_min: float,
     f0_max: float,
-) -> np.ndarray:
+):
     import librosa
 
-    f0, _ = librosa.piptrack(y=audio, sr=sampling_rate, fmin=f0_min, fmax=f0_max)
-    return np.argmax(f0, axis=0)
+    f0 = librosa.yin(
+        y=audio,
+        sr=sampling_rate,
+        fmin=f0_min,
+        fmax=f0_max,
+        hop_length=int(time_step * sampling_rate),
+    )
+    f0[f0 >= f0_max] = 0
+    return f0
+
+
+def extract_f0_pyin(
+    audio: np.ndarray,
+    sampling_rate: int,
+    time_step: float,
+    f0_min: float,
+    f0_max: float,
+):
+    import librosa
+
+    f0, *_ = librosa.pyin(
+        y=audio,
+        sr=sampling_rate,
+        fmin=f0_min,
+        fmax=f0_max,
+        hop_length=int(time_step * sampling_rate),
+        fill_na=0,
+    )
+    return f0
 
 
 F0_EXTRACTORS = {
     "pm": extract_f0_pm,
     "harvest": extract_f0_harvest,
-    # "librosa": extract_f0_librosa,
+    "yin": extract_f0_yin,
+    "pyin": extract_f0_pyin,
 }
 
 
@@ -97,7 +125,7 @@ class RVCFeatureExtractor(Wav2Vec2FeatureExtractor):
         self.window = window
         self.f0_min = f0_min
         self.f0_max = f0_max
-        self.time_step = window / sampling_rate * 1000
+        self.time_step = window / sampling_rate
         self.f0_mel_min = 1127 * np.log(1 + f0_min / 700)
         self.f0_mel_max = 1127 * np.log(1 + f0_max / 700)
         self.f0_method = f0_method
@@ -130,6 +158,15 @@ class RVCFeatureExtractor(Wav2Vec2FeatureExtractor):
         return features
 
     def set_f0_method(self, f0_method: str):
+        """
+        Set the f0 extraction method.
+
+        The available methods are:
+            pm: Praat's Pitch, A reliable and accurate F0 estimation method, suitable for handling noise but with slower processing speed.
+            harvest: A high-accuracy F0 estimation method with relatively fast processing speed, suitable for handling a wide range of F0 frequencies.
+            yin: A well-balanced F0 estimation method in terms of processing speed and accuracy, offering some noise tolerance.
+            pyin: PYIN: A probabilistic YIN-based F0 estimation method with good accuracy and noise tolerance, but slower processing speed.
+        """
         self.f0_method = f0_method
         self._f0_extractor = F0_EXTRACTORS.get(f0_method)
 

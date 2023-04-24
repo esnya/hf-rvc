@@ -21,11 +21,12 @@ def eval_dataset(
     all_data: bool = False,
     output_device_index: int | None = None,
     output_file_path: str | None = None,
-    f0_method: Literal["pm"] | Literal["harvest"] = "pm",
+    f0_method: str = "pm",
     auto_m2f: bool = False,
     auto_f2m: bool = False,
     f0_up_key: float = 0.0,
     skip_original: bool = False,
+    pad_frames: int = 8000,
 ):
     """Evaluate dataset.
 
@@ -45,6 +46,7 @@ def eval_dataset(
         auto_f2m: Set to True to automatically convert female to male (default: False).
         f0_up_key: F0 key up value (default: 0.0).
         skip_original: Set to True to skip the original audio (default: False).
+        pad_frames: Number of frames to pad before concatenation (default: 8000).
     """
 
     def _get_auto_key(source_gender: str) -> float:
@@ -71,7 +73,9 @@ def eval_dataset(
         channels=1,
         format=pyaudio.paFloat32,
         output=True,
-        output_device_index=output_device_index,
+        output_device_index=None
+        if output_device_index is None
+        else int(output_device_index),
     )
 
     feature_extractor = RVCFeatureExtractor.from_pretrained(model_name)
@@ -91,12 +95,18 @@ def eval_dataset(
             audio = data["audio"]
 
             input_features = feature_extractor(
-                audio["array"],
+                np.pad(audio["array"], (pad_frames, pad_frames), mode="reflect"),
                 sampling_rate=audio["sampling_rate"],
                 f0_up_key=key,
                 return_tensors="pt",
             )
-            output = model(**input_features).numpy()
+
+            output_pad_frames = pad_frames * audio["sampling_rate"] // 48000
+            output = (
+                model(**input_features)
+                .numpy()
+                .flatten()[output_pad_frames:-output_pad_frames]
+            )
 
             resampled_input = resample(
                 audio["array"], orig_sr=16000, target_sr=48000
