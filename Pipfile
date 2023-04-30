@@ -10,13 +10,10 @@ name = "downloadpytorch"
 
 [packages]
 torch = {version = "*", index = "downloadpytorch"}
-datasets = "*"
 pyworld = "*"
 transformers = "*"
-evaluate = "*"
 argh = "*"
 safetensors = "*"
-fairseq = "*"
 librosa = "*"
 praat-parselmouth = "*"
 pyaudio = "*"

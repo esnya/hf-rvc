@@ -56,6 +56,7 @@ For more detailed usage of each tool, you can check the --help option of the spe
 Since the models are not yet available on HuggingFace, you may need to convert the original `.pth` model files or the original `hubert_base.pt` model to be compatible with HF RVC. This can be done using the `convert-***` command line tools. The conversion not only adapts the models to the different frameworks but also, by default, ensures compatibility with the [safetensor](https://github.com/huggingface/safetensors) format for **secure** model sharing.
 
 When using the command line tools to load the `hubert_base.pt` model, you must provide the `--unsafe` option to confirm that you have obtained the model from a trusted source.
+You also need to install the `fairseq` package to convert the original `.pth` model files. You can install it with this package by with suffix `[convert]`.
 
 Example:
 
