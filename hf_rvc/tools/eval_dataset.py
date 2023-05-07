@@ -1,9 +1,5 @@
 import numpy as np
-import pyaudio
 import torch
-from datasets import Audio, Dataset, load_dataset
-from librosa.core import resample
-from scipy.io.wavfile import write
 
 from ..models import RVCFeatureExtractor, RVCModel
 
@@ -46,6 +42,11 @@ def eval_dataset(
         skip_original: Set to True to skip the original audio (default: False).
         pad_frames: Number of frames to pad before concatenation (default: 8000).
     """
+
+    import pyaudio
+    from datasets import Audio, Dataset, load_dataset
+    from librosa.core import resample
+    from scipy.io.wavfile import write
 
     def _get_auto_key(source_gender: str) -> float:
         if auto_m2f and source_gender == "male":

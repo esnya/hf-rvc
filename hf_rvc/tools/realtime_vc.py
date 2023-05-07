@@ -5,7 +5,6 @@ from os import PathLike
 from typing import ContextManager, Literal
 
 import numpy as np
-import pyaudio
 import torch
 
 from ..models import RVCFeatureExtractor, RVCModel
@@ -39,6 +38,8 @@ def output_process_target(
     sampling_rate: int,
     output_device_index: int | None = None,
 ) -> None:
+    import pyaudio
+
     pa = pyaudio.PyAudio()
 
     output_stream = pa.open(
@@ -104,6 +105,8 @@ def realtime_vc(
         device (str | torch.device, optional): Device. Defaults to "cpu". "cuda" is recommended.
         fp16 (bool, optional): Use fp16. Defaults to False.
     """
+
+    import pyaudio
 
     if not isinstance(feature_extractor, RVCFeatureExtractor):
         if feature_extractor is None:
