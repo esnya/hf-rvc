@@ -23,4 +23,8 @@ jobs:
     - run: |
         python -m pip install --upgrade pip
         pip install .[full]
+    - uses: actions/cache@v3
+      with:
+        path: ~/.cache/huggingface/
+        key: ${{ runner.os }}-huggingface
     - run: python -m unittest
