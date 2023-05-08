@@ -21,6 +21,3 @@ datasets = "*"
 
 [dev-packages]
 bandit = "*"
-
-[requires]
-python_version = "3.9.13"
