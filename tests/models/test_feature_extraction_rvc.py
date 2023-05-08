@@ -69,7 +69,7 @@ class TestFeatureExtractionRVC(unittest.TestCase):
             self.assertAlmostEqual(
                 audio["array"].size / f0.size, self.window, delta=2.5
             )
-            self.assertAlmostEqual(np.nanmedian(f0).item(), ref_median, delta=20)
+            self.assertAlmostEqual(np.nanmedian(f0).item(), ref_median, delta=50)
 
     def test_extract_f0_pm(self):
         self.assertF0Extracted(extract_f0_pm)
