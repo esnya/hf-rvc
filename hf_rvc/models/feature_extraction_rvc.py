@@ -1,4 +1,4 @@
-from typing import Any, Union
+from typing import Any, Optional, Union
 
 import numpy as np
 from transformers import Wav2Vec2FeatureExtractor
@@ -134,9 +134,9 @@ class RVCFeatureExtractor(Wav2Vec2FeatureExtractor):
     def __call__(
         self,
         audio: np.ndarray,
-        sampling_rate: Union[int, None] = None,
+        sampling_rate: Optional[int] = None,
         f0_up_key: float = 0,
-        return_tensors: Union[str, TensorType, None] = None,
+        return_tensors: Optional[Union[str, TensorType]] = None,
     ) -> BatchFeature:
         input_values = Wav2Vec2FeatureExtractor.__call__(
             self, audio, sampling_rate=sampling_rate
@@ -171,7 +171,10 @@ class RVCFeatureExtractor(Wav2Vec2FeatureExtractor):
         self._f0_extractor = F0_EXTRACTORS.get(f0_method)
 
     def _extract_f0_features(
-        self, audio: np.ndarray, f0_up_key: float = 0, p_len: Union[int, None] = None
+        self,
+        audio: np.ndarray,
+        f0_up_key: float = 0,
+        p_len: Optional[int] = None,
     ) -> tuple[np.ndarray, np.ndarray]:
         if p_len is None:
             p_len = audio.shape[-1] // self.window
