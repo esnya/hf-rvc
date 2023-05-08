@@ -1,3 +1,5 @@
+from typing import Optional
+
 import numpy as np
 import torch
 
@@ -10,11 +12,11 @@ def eval_dataset(
     dataset_name: str = "ja",
     dataset_split: str = "validation",
     shuffle: bool = True,
-    shuffle_seed: int | None = None,
+    shuffle_seed: Optional[int] = None,
     num_data: int = 10,
     all_data: bool = False,
-    output_device_index: int | None = None,
-    output_file_path: str | None = None,
+    output_device_index: Optional[int] = None,
+    output_file_path: Optional[str] = None,
     f0_method: str = "pm",
     auto_m2f: bool = False,
     auto_f2m: bool = False,
