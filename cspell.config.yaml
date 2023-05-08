@@ -5,6 +5,7 @@ dictionaries: []
 words:
   - argmax
   - esnya
+  - fairseq
   - fmax
   - fmin
   - librosa
