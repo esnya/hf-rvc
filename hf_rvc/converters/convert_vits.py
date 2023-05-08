@@ -1,5 +1,5 @@
 from os import PathLike
-from typing import Any
+from typing import Any, Optional, Union
 
 import torch
 
@@ -10,7 +10,7 @@ from ..models.vits.models import (
 from ..utils.path import remove_extension
 
 
-def load_vits_checkpoint(vits_path: str | PathLike) -> dict[str, Any]:
+def load_vits_checkpoint(vits_path: Union[str, PathLike]) -> dict[str, Any]:
     return torch.load(vits_path, map_location="cpu", weights_only=True)
 
 
@@ -28,8 +28,8 @@ def extract_vits_state(vits_checkpoint: dict[str, Any]) -> dict[str, Any]:
 
 
 def convert_vits(
-    vits_checkpoint: str | PathLike | dict[str, Any],
-    save_directory: str | PathLike | None = None,
+    vits_checkpoint: Union[str, PathLike, dict[str, Any]],
+    save_directory: Optional[Union[str, PathLike]] = None,
     safe_serialization=True,
 ) -> SynthesizerTrnMs256NSFsid:
     """Convert VITS model.

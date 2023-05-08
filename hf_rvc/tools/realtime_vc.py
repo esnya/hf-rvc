@@ -2,7 +2,7 @@ import math
 import multiprocessing
 import time
 from os import PathLike
-from typing import ContextManager, Literal
+from typing import ContextManager, Literal, Optional, Union
 
 import numpy as np
 import torch
@@ -11,7 +11,7 @@ from ..models import RVCFeatureExtractor, RVCModel
 
 
 class PerfCounter(ContextManager):
-    def __init__(self, name: str | None = None):
+    def __init__(self, name: Optional[str] = None):
         self.name = name
 
     def __enter__(self) -> "PerfCounter":
@@ -36,7 +36,7 @@ def output_process_target(
     queue: multiprocessing.Queue,
     stop_event: multiprocessing.Event,  # type: ignore
     sampling_rate: int,
-    output_device_index: int | None = None,
+    output_device_index: Optional[int] = None,
 ) -> None:
     import pyaudio
 
@@ -66,8 +66,8 @@ def unroll_mean(x, y, window):
 
 
 def realtime_vc(
-    model: str | PathLike | RVCModel,
-    feature_extractor: str | PathLike | RVCFeatureExtractor | None = None,
+    model: Union[str, PathLike, RVCModel],
+    feature_extractor: Optional[Union[str, PathLike, RVCFeatureExtractor]] = None,
     buffering_seconds: float = 0.5,
     auto_latency: bool = False,
     min_buffering_seconds: float = 0.1,
@@ -75,11 +75,11 @@ def realtime_vc(
     padding_seconds: float = 0.1,
     f0_up_key: float = 0,
     f0_method: Literal["pm", "harvest"] = "pm",
-    input_device_index: int | None = None,
-    output_device_index: int | None = None,
+    input_device_index: Optional[int] = None,
+    output_device_index: Optional[int] = None,
     output_sampling_rate: int = 48000,
     volume: float = 1.0,
-    device: str | torch.device = "cpu",
+    device: Union[str, torch.device] = "cpu",
     fp16: bool = False,
 ) -> None:
     """

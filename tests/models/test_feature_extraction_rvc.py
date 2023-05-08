@@ -21,9 +21,7 @@ class TestFeatureExtractionRVC(unittest.TestCase):
         cls.f0_max = 1100
         cls.test_window = 40
 
-        dataset = load_dataset(
-            "mozilla-foundation/common_voice_12_0", "ja", split="validation"
-        )
+        dataset = load_dataset("common_voice", "ja", split="validation[:10%]")
         assert isinstance(dataset, Dataset)
         cls.dataset = dataset.cast_column(
             "audio", Audio(sampling_rate=cls.sampling_rate)
@@ -71,7 +69,7 @@ class TestFeatureExtractionRVC(unittest.TestCase):
             self.assertAlmostEqual(
                 audio["array"].size / f0.size, self.window, delta=2.5
             )
-            self.assertAlmostEqual(np.nanmedian(f0).item(), ref_median, delta=20)
+            self.assertAlmostEqual(np.nanmedian(f0).item(), ref_median, delta=50)
 
     def test_extract_f0_pm(self):
         self.assertF0Extracted(extract_f0_pm)

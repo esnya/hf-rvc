@@ -1,5 +1,6 @@
 from os import PathLike
 from pathlib import Path
+from typing import Optional, Union
 
 from transformers import HubertConfig, HubertForCTC
 
@@ -23,9 +24,9 @@ from ..models.vits.models import (
 
 
 def convert_rvc(
-    vits_path: str | PathLike,
-    save_directory: str | PathLike | None = None,
-    hubert_path: str | PathLike = "./models/hubert_base",
+    vits_path: Union[str, PathLike],
+    save_directory: Optional[Union[str, PathLike]] = None,
+    hubert_path: Union[str, PathLike] = "./models/hubert_base",
     f0_method: str = "pm",
     unsafe: bool = False,
     safe_serialization=True,

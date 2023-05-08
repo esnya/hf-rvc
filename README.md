@@ -10,7 +10,7 @@ The original implementation of the Retrieval-based-Voice-Conversion (RVC) can be
 
 ## Installation
 
-This library supports Python 3.10 only. If you would like to use this library with an older version of Python, you may need to modify the code to ensure compatibility. In such cases, we welcome pull requests for any necessary changes.
+Supported Python versions: 3.9, 3.10 (recommended)
 
 To install the library, you can use the following command:
 
