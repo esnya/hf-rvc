@@ -1,4 +1,4 @@
-from typing import Any, Optional, Union
+from typing import Any, Dict, Optional, Tuple, Union
 
 import numpy as np
 from transformers import Wav2Vec2FeatureExtractor
@@ -175,7 +175,7 @@ class RVCFeatureExtractor(Wav2Vec2FeatureExtractor):
         audio: np.ndarray,
         f0_up_key: float = 0,
         p_len: Optional[int] = None,
-    ) -> tuple[np.ndarray, np.ndarray]:
+    ) -> Tuple[np.ndarray, np.ndarray]:
         if p_len is None:
             p_len = audio.shape[-1] // self.window
 
@@ -209,7 +209,7 @@ class RVCFeatureExtractor(Wav2Vec2FeatureExtractor):
 
         return f0_coarse, f0bak
 
-    def to_dict(self) -> dict[str, Any]:
+    def to_dict(self) -> Dict[str, Any]:
         """
         Serializes this instance to a Python dictionary.
 

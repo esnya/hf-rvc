@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Any
+from typing import Any, Dict
 
 from transformers import HubertConfig, PretrainedConfig
 
@@ -19,7 +19,7 @@ class RVCConfig(PretrainedConfig):
         self.hubert = hubert
         self.vits = vits
 
-    def to_dict(self) -> dict[str, Any]:
+    def to_dict(self) -> Dict[str, Any]:
         dict = super().to_dict()
         dict["hubert"] = self.hubert.to_dict()
         dict["vits"] = self.vits.__dict__
