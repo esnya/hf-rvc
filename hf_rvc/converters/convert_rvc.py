@@ -1,6 +1,6 @@
 from os import PathLike
 from pathlib import Path
-from typing import Optional, Union
+from typing import Dict, Optional, Union
 
 from transformers import HubertConfig, HubertForCTC
 

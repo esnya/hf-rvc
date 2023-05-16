@@ -1,5 +1,5 @@
 from os import PathLike
-from typing import Any, Optional, Union
+from typing import Any, Dict, Optional, Union
 
 import torch
 from transformers import HubertConfig, HubertForCTC
@@ -36,7 +36,7 @@ def extract_hubert_config(fairseq_hubert) -> HubertConfig:
 
 def extract_hubert_state(
     config_or_model: Union[HubertConfig, HubertForCTC], fairseq_hubert
-) -> dict[str, Any]:
+) -> Dict[str, Any]:
     fairseq_state_dict = fairseq_hubert.state_dict()
     assert isinstance(fairseq_state_dict, dict)
 

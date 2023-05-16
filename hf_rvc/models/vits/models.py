@@ -3,6 +3,7 @@ import os
 import pdb
 from dataclasses import dataclass
 from time import time as ttime
+from typing import List
 
 import numpy as np
 import torch
@@ -539,11 +540,11 @@ class SynthesizerTrnMs256NSFsidConfig(PretrainedConfig):
         kernel_size: int = 3,
         p_dropout: int = 0,
         resblock: str = "1",
-        resblock_kernel_sizes: list[int] = [3, 7, 11],
-        resblock_dilation_sizes: list[list[int]] = [[1, 3, 5], [1, 3, 5], [1, 3, 5]],
-        upsample_rates: list[int] = [10, 6, 2, 2, 2],
+        resblock_kernel_sizes: List[int] = [3, 7, 11],
+        resblock_dilation_sizes: List[List[int]] = [[1, 3, 5], [1, 3, 5], [1, 3, 5]],
+        upsample_rates: List[int] = [10, 6, 2, 2, 2],
         upsample_initial_channel: int = 512,
-        upsample_kernel_sizes: list[int] = [16, 16, 4, 4, 4],
+        upsample_kernel_sizes: List[int] = [16, 16, 4, 4, 4],
         spk_embed_dim: int = 109,
         gin_channels: int = 256,
         sr: int = 48000,
