@@ -51,5 +51,5 @@ class RVCModel(PreTrainedModel):
 
     def to(self, *args, **kwargs) -> "RVCModel":
         model = super().to(*args, **kwargs)
-        model.sid = self.sid.to(*args, **kwargs)
+        model.sid = self.sid.to(device=model.device)
         return model
