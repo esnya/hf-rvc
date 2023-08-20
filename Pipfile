@@ -18,6 +18,10 @@ librosa = "*"
 praat-parselmouth = "*"
 pyaudio = "*"
 datasets = "*"
+librosa = "*"
+gradio = "*"
+accelerate = "*"
+optimum = "*"
 
 [dev-packages]
 bandit = "*"
