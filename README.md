@@ -10,12 +10,44 @@ The original implementation of the Retrieval-based-Voice-Conversion (RVC) can be
 
 ## Installation
 
-Supported Python versions: 3.8, 3.9, 3.10 (recommended)
+**Supported Python versions:** 3.11+ (recommended: 3.12+)
 
-To install the library, you can use the following command:
+### Quick Install
+```bash
+# Using uv (fastest)
+uv add hf-rvc
 
+# Using pip
+pip install hf-rvc
 ```
-pip install git+https://github.com/esnya/hf-rvc.git#egg=hf-rvc
+
+### Development Setup
+```bash
+# Clone and setup with uv (recommended)
+git clone https://github.com/esnya/hf-rvc.git
+cd hf-rvc
+uv sync --extra dev --extra full
+
+# Or with pip
+pip install -e .[dev,full]
+
+# Setup pre-commit hooks
+uv run pre-commit install
+```
+
+### Optional Dependencies
+```bash
+# Model conversion from original RVC
+uv add hf-rvc[converter]
+
+# Gradio web interface
+uv add hf-rvc[gradio] 
+
+# Evaluation tools
+uv add hf-rvc[eval]
+
+# Everything
+uv add hf-rvc[full]
 ```
 
 
