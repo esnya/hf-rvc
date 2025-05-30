@@ -3,3 +3,29 @@ __pycache__
 /hubert_base/
 /build/
 *.egg-info/
+
+# Test coverage files
+.coverage
+coverage.xml
+htmlcov/
+.pytest_cache/
+
+# Development environment
+.venv/
+.env
+.env.local
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.temp
+*.log
