@@ -1,7 +1,7 @@
 import logging
 from functools import lru_cache
 from time import time
-from typing import Any, Dict, Optional, Tuple, cast
+from typing import Any
 
 import numpy as np
 import torch
@@ -16,13 +16,13 @@ logger = logging.getLogger(__name__)
 @lru_cache(maxsize=1)
 def _load_model(
     model_path: str, device: str, fp16: bool, better_tranformer: bool
-) -> Tuple[RVCFeatureExtractor, RVCModel, Dict[str, Dict[str, Any]]]:
+) -> tuple[RVCFeatureExtractor, RVCModel, dict[str, dict[str, Any]]]:
     logger.info("Loading model from %s", model_path)
     model = RVCModel.from_pretrained(model_path)
     assert isinstance(model, RVCModel)
     model = model.to(device, dtype=torch.float16 if fp16 else torch.float32)
     if better_tranformer:
-        model = cast(RVCModel, model.to_bettertransformer())
+        model = model.to_bettertransformer()
     logger.info(
         "Model loaded: %s(%s, device=%s, dtype=%s, training=%s)",
         model.__class__.__name__,
@@ -43,33 +43,33 @@ def _load_model(
     return (
         feature_extractor,
         model.eval(),
-        dict(
-            model=dict(
-                class_name=model.__class__.__name__,
-                name_or_path=model.name_or_path,
-                device=str(model.device),
-                dtype=str(model.dtype),
-                training=model.training,
-            ),
-            feature_extractor=dict(
-                class_name=feature_extractor.__class__.__name__,
-                sampling_rate=feature_extractor.sampling_rate,
-            ),
-        ),
+        {
+            "model": {
+                "class_name": model.__class__.__name__,
+                "name_or_path": model.name_or_path,
+                "device": str(model.device),
+                "dtype": str(model.dtype),
+                "training": model.training,
+            },
+            "feature_extractor": {
+                "class_name": feature_extractor.__class__.__name__,
+                "sampling_rate": feature_extractor.sampling_rate,
+            },
+        },
     )
 
 
-Audio = Tuple[int, np.ndarray]
+Audio = tuple[int, np.ndarray[Any, np.dtype[Any]]]
 
 
-@torch.inference_mode()
+@torch.inference_mode()  # type: ignore[misc]
 def _vc_offline(
-    model: Optional[RVCModel],
-    feature_extractor: Optional[RVCFeatureExtractor],
-    f0_method: Optional[str],
-    f0_up_key: Optional[float],
-    inputs: Optional[Audio],
-) -> Optional[Audio]:
+    model: RVCModel | None,
+    feature_extractor: RVCFeatureExtractor | None,
+    f0_method: str | None,
+    f0_up_key: float | None,
+    inputs: Audio | None,
+) -> Audio | None:
     import librosa
 
     if model is None or feature_extractor is None or inputs is None:
@@ -107,19 +107,19 @@ def _vc_offline(
     return (48000, model_output.reshape((-1, 1)))
 
 
-@torch.inference_mode()
+@torch.inference_mode()  # type: ignore[misc]
 def _vc(
-    model: Optional[RVCModel],
-    feature_extractor: Optional[RVCFeatureExtractor],
-    f0_method: Optional[str],
-    f0_up_key: Optional[float],
-    latency: Optional[float],
-    padding_seconds: Optional[float],
-    min_volume: Optional[float],
-    inputs: Optional[Audio],
-    buffer: Optional[np.ndarray],
-    output: Optional[Audio],
-) -> Tuple[Optional[Audio], Optional[np.ndarray]]:
+    model: RVCModel | None,
+    feature_extractor: RVCFeatureExtractor | None,
+    f0_method: str | None,
+    f0_up_key: float | None,
+    latency: float | None,
+    padding_seconds: float | None,
+    min_volume: float | None,
+    inputs: Audio | None,
+    buffer: np.ndarray[Any, np.dtype[Any]] | None,
+    output: Audio | None,
+) -> tuple[Audio | None, np.ndarray[Any, np.dtype[Any]] | None]:
     import librosa
 
     start_time = time()
@@ -132,10 +132,7 @@ def _vc(
     input_audio = input_audio.astype(np.float32).mean(-1) / 32768
     input_audio = librosa.resample(input_audio, orig_sr=input_sr, target_sr=16000)
 
-    if buffer is None:
-        buffer = input_audio
-    else:
-        buffer = np.concatenate([buffer, input_audio])
+    buffer = input_audio if buffer is None else np.concatenate([buffer, input_audio])
 
     if not latency:
         latency = 0.5
@@ -244,7 +241,7 @@ def gradio_vc(server_name: str = "localhost", server_port: int = 7860, **kwargs)
 
             audio_streaming_input = gr.Audio(
                 label="Audio Input",
-                source="microphone",
+                sources=["microphone"],
                 type="numpy",
                 streaming=True,
             )
@@ -254,7 +251,7 @@ def gradio_vc(server_name: str = "localhost", server_port: int = 7860, **kwargs)
         with gr.Tab("Record"):
             audio_recorded_input = gr.Audio(
                 label="Audio Input",
-                source="microphone",
+                sources=["microphone"],
                 type="numpy",
                 streaming=False,
             )
@@ -262,7 +259,7 @@ def gradio_vc(server_name: str = "localhost", server_port: int = 7860, **kwargs)
         with gr.Tab("File"):
             audio_file_input = gr.Audio(
                 label="Audio Input",
-                source="upload",
+                sources=["upload"],
                 type="numpy",
                 streaming=False,
             )

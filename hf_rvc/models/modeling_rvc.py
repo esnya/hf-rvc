@@ -1,5 +1,6 @@
 import torch
-from transformers import HubertConfig, HubertForCTC, PreTrainedModel
+from transformers.modeling_utils import PreTrainedModel
+from transformers.models.hubert import HubertConfig, HubertForCTC
 
 from .configuration_rvc import RVCConfig
 from .vits.models import SynthesizerTrnMs256NSFsid, SynthesizerTrnMs256NSFsidConfig
@@ -29,7 +30,33 @@ class RVCModel(PreTrainedModel):
 
         self.sid = torch.tensor([0], dtype=torch.long)
 
+        # PyTorchモデルの標準属性
+        self.name_or_path: str = ""
+
         self.post_init()
+
+    @property
+    def device(self) -> torch.device:
+        """モデルが配置されているデバイスを返す"""
+        return next(self.parameters()).device
+
+    @property
+    def dtype(self) -> torch.dtype:
+        """モデルのデータ型を返す"""
+        return next(self.parameters()).dtype
+
+    def to_bettertransformer(self) -> "RVCModel":
+        """Better Transformerへの変換（現在は自身を返すのみ）"""
+        return self
+
+    def __call__(
+        self,
+        input_values: torch.Tensor,
+        f0_coarse: torch.Tensor,
+        f0: torch.Tensor,
+    ) -> torch.Tensor:
+        """モデルの呼び出し（forwardのエイリアス）"""
+        return self.forward(input_values, f0_coarse, f0)
 
     def forward(
         self,

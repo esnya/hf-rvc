@@ -41,7 +41,7 @@ uv run pre-commit install
 uv add hf-rvc[converter]
 
 # Gradio web interface
-uv add hf-rvc[gradio] 
+uv add hf-rvc[gradio]
 
 # Evaluation tools
 uv add hf-rvc[eval]
