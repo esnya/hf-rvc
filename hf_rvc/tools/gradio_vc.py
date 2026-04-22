@@ -245,7 +245,7 @@ def gradio_vc(server_name: str = "localhost", server_port: int = 7860, **kwargs)
 
             audio_streaming_input = gr.Audio(
                 label="Audio Input",
-                source="microphone",
+                sources=["microphone"],
                 type="numpy",
                 streaming=True,
             )
@@ -255,7 +255,7 @@ def gradio_vc(server_name: str = "localhost", server_port: int = 7860, **kwargs)
         with gr.Tab("Record"):
             audio_recorded_input = gr.Audio(
                 label="Audio Input",
-                source="microphone",
+                sources=["microphone"],
                 type="numpy",
                 streaming=False,
             )
@@ -263,7 +263,7 @@ def gradio_vc(server_name: str = "localhost", server_port: int = 7860, **kwargs)
         with gr.Tab("File"):
             audio_file_input = gr.Audio(
                 label="Audio Input",
-                source="upload",
+                sources=["upload"],
                 type="numpy",
                 streaming=False,
             )
