@@ -21,6 +21,7 @@ datasets = "*"
 gradio = "~=6.7.0"
 accelerate = "*"
 optimum = "*"
+certifi = ">=2026.10.19"
 
 [dev-packages]
 bandit = "*"
