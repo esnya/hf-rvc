@@ -10,7 +10,14 @@ The original implementation of the Retrieval-based-Voice-Conversion (RVC) can be
 
 ## Installation
 
-Supported Python versions: 3.8, 3.9, 3.10 (recommended)
+Python 3.11 or newer is required. The dependency smoke tests run on Python 3.11.
+
+The Pipenv environment uses PyTorch 2.7.1 with CUDA 11.8, the last published
+PyTorch release on that CUDA index. For CPU-only use, install the corresponding
+2.7.1 CPU wheel from the official PyTorch index before installing this package.
+
+See [dependency security notes](docs/dependency-security.md) for compatibility
+limits and the unresolved Gradio/Pillow constraint.
 
 To install the library, you can use the following command:
 

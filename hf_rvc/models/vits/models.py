@@ -575,6 +575,13 @@ class SynthesizerTrnMs256NSFsidConfig(PretrainedConfig):
 class SynthesizerTrnMs256NSFsid(PreTrainedModel):
     config_class = SynthesizerTrnMs256NSFsidConfig
 
+    @staticmethod
+    def _fix_state_dict_key_on_load(key):
+        # VITS retains torch.nn.utils.weight_norm and its weight_g/weight_v
+        # checkpoint keys. Transformers' generic parametrization migration
+        # applies to HuBERT, but would silently discard these VITS weights.
+        return key.replace(".gamma", ".weight").replace(".beta", ".bias")
+
     def __init__(self, config: SynthesizerTrnMs256NSFsidConfig, **kwargs):
         super().__init__(config, **kwargs)
         sr = config.sr
