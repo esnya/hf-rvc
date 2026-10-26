@@ -6,8 +6,14 @@ from .vits.models import SynthesizerTrnMs256NSFsid, SynthesizerTrnMs256NSFsidCon
 
 
 class RVCModel(PreTrainedModel):
-    config_class = HubertConfig
+    config_class = RVCConfig
     is_composition = True
+
+    @staticmethod
+    def _fix_state_dict_key_on_load(key):
+        if key.startswith("vits."):
+            return SynthesizerTrnMs256NSFsid._fix_state_dict_key_on_load(key)
+        return PreTrainedModel._fix_state_dict_key_on_load(key)
 
     def __init__(
         self,

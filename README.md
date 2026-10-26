@@ -10,13 +10,31 @@ The original implementation of the Retrieval-based-Voice-Conversion (RVC) can be
 
 ## Installation
 
-Supported Python versions: 3.8, 3.9, 3.10 (recommended)
+Python 3.11 or newer is required. The dependency smoke tests run on Python 3.11.
+
+The Pipenv environment uses PyTorch 2.7.1 with CUDA 11.8, the last published
+PyTorch release on that CUDA index. For CPU-only use, install the corresponding
+2.7.1 CPU wheel from the official PyTorch index before installing this package.
+
+See [dependency security notes](docs/dependency-security.md) for compatibility
+limits and the maintained Gradio/Pillow build.
 
 To install the library, you can use the following command:
 
 ```
 pip install git+https://github.com/esnya/hf-rvc.git#egg=hf-rvc
 ```
+
+The optional UI uses a source-based Gradio maintenance build with Pillow 13.
+From a checkout of this repository, install the recipe and the UI extra together:
+
+```bash
+python -m pip install ./dependency_patches/gradio '.[gradio]'
+```
+
+`pipenv sync` also installs this local recipe. The plain library installation
+does not install the UI. The maintenance version is not published on PyPI;
+installing the UI extra requires the recipe from this checkout.
 
 
 ## Basic Usage
