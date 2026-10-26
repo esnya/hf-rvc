@@ -37,12 +37,30 @@ that distinction the newer generic loader silently leaves VITS parameters
 uninitialized. The offline tests compare every tensor after local RVC and VITS
 safetensors round trips, including the correct composite RVC configuration.
 
-Gradio is held to the 6.16 patch series, compatible with the Hub version required
-by Transformers 4.48.3. It fixes the cookie injection and FileExplorer traversal
-advisories. **Pillow remains unresolved:** Gradio 6.16.0 and even the current
-6.30.0 require `pillow<13.0`, while the current critical Pillow fixes require
-13.0.0 (which also requires Python 3.11+). This update does not override that
-upstream constraint and must not be described as a clean security scan.
+The UI uses `gradio==6.16.0+esnya.pillow13.1` with Pillow 13.0.0. This local
+maintenance build retains Gradio 6.16.0's frontend protocol and its compatibility
+with Transformers 4.48.3's Hub dependency. It keeps the cookie injection and
+FileExplorer traversal fixes. Official Gradio 6.16.0 and 6.30.0 require
+`pillow<13.0`; the [reviewable recipe](../dependency_patches/gradio/README.md)
+changes one PNG helper to preserve legacy integer clipping explicitly, declares
+`pillow<14.0`, and identifies the resulting distribution with a local version.
+The application selects Pillow 13.0.0 for the current decoder fixes. There is
+no resolver override, and this maintenance build is not an official release.
+
+The stdlib-only PEP 517 backend checks the exact official wheel URL, size,
+SHA-256, patch contexts and prepared metadata, preserves its license notices,
+and rebuilds RECORD. Metadata preparation is offline. A build downloads only
+the fixed public Gradio wheel, or uses `ESNYA_COMPAT_WHEELHOUSE` for an offline
+wheelhouse. The original wheel's Python/build code is not executed by the build.
+The Pipenv path entry and the UI extra use the same recipe; plain library
+installs continue to exclude the UI. The lock change preserves every unrelated
+package record, including the Torch/CUDA and Transformers selections.
+
+The optional UI checks construct the real component tree with launch disabled,
+exercise generated WAV input/output and audio callbacks, and round-trip PNG,
+integer PNG, JPEG, TIFF and multi-frame GIF fixtures. They load no pretrained
+model and start no web server. Pillow 13 compatibility of these paths does not
+establish the applicability or absence of every Gradio/Transformers advisory.
 
 The default CI tests use locally constructed tiny models, generated tensor
 checkpoints, and local safetensors round trips. They require no model weights,
