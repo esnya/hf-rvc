@@ -9,7 +9,7 @@ verify_ssl = true
 name = "downloadpytorch"
 
 [packages]
-torch = {version = "==2.7.1+cu118", index = "downloadpytorch"}
+torch = {version = "==2.13.0", index = "downloadpytorch"}
 pyworld = "*"
 transformers = "==4.48.3"
 argh = "*"
