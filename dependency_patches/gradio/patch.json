@@ -1,0 +1,39 @@
+{
+  "name": "gradio",
+  "version": "6.16.0+esnya.pillow13.1",
+  "upstream": {
+    "filename": "gradio-6.16.0-py3-none-any.whl",
+    "url": "https://files.pythonhosted.org/packages/2a/12/ac98683fa45d84c2c96c14acdb040aa746209089ea045c766f380549ecec/gradio-6.16.0-py3-none-any.whl",
+    "size": 20097732,
+    "sha256": "a5de01bf17336bf421d52af4b5dbd9fdbd530762c485067748456ccb797700bb"
+  },
+  "upstream_dist_info": "gradio-6.16.0.dist-info",
+  "dist_info": "gradio-6.16.0+esnya.pillow13.1.dist-info",
+  "wheel_filename": "gradio-6.16.0+esnya.pillow13.1-py3-none-any.whl",
+  "metadata_sha256": "fb6af900ec91b94dfe55e5decd2474d8933d94ce68a9c000d13e2d38be42dbb3",
+  "wheel_metadata_sha256": "0b86f85c0b7914c9d97cb32d5a9b76ab14aac9cb29c21fdabc43cdf7a55df3e3",
+  "replacements": {
+    "gradio-6.16.0.dist-info/METADATA": [
+      {
+        "old": "Version: 6.16.0\n",
+        "new": "Version: 6.16.0+esnya.pillow13.1\n"
+      },
+      {
+        "old": "Requires-Dist: pillow<13.0,>=8.0\n",
+        "new": "Requires-Dist: pillow<14.0,>=8.0\n"
+      }
+    ],
+    "gradio/processing_utils.py": [
+      {
+        "old": "def encode_pil_to_bytes(pil_image, format=\"png\"):\n    with BytesIO() as output_bytes:",
+        "new": "def encode_pil_to_bytes(pil_image, format=\"png\"):\n    # Preserve Pillow <=12's integer PNG clipping explicitly on Pillow 13.\n    if format.lower() == \"png\" and pil_image.mode == \"I\":\n        pil_image = pil_image.convert(\"I;16\")\n    with BytesIO() as output_bytes:"
+      }
+    ],
+    "gradio-6.16.0.dist-info/WHEEL": [
+      {
+        "old": "Generator: hatchling 1.30.1\n",
+        "new": "Generator: esnya-maintenance-wheel-backend-1\n"
+      }
+    ]
+  }
+}

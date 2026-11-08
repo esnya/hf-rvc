@@ -5,7 +5,6 @@ from typing import Any, Dict, Optional, Tuple, cast
 
 import numpy as np
 import torch
-from pyparsing import Opt
 
 from ..models.feature_extraction_rvc import F0_EXTRACTORS, RVCFeatureExtractor
 from ..models.modeling_rvc import RVCModel

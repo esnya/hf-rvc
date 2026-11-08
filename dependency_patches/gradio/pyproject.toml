@@ -1,0 +1,13 @@
+[build-system]
+requires = []
+build-backend = "build_backend"
+backend-path = ["."]
+
+[project]
+name = "gradio"
+version = "6.16.0+esnya.pillow13.1"
+requires-python = ">=3.10"
+dynamic = ["dependencies", "optional-dependencies"]
+
+[tool.uv]
+cache-keys = [{ file = "pyproject.toml" }, { file = "build_backend.py" }, { file = "patch.json" }, { file = "METADATA" }, { file = "WHEEL" }, { file = "UPSTREAM_LICENSE" }]
