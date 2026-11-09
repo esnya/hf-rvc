@@ -69,8 +69,8 @@ class TestLocalModel(unittest.TestCase):
         self.assertIsInstance(restored.config, RVCConfig)
         self.assertIsInstance(restored.config.hubert, HubertConfig)
         self.assertEqual(restored.hubert.config.hidden_size, 16)
-        self.assertEqual(loading["missing_keys"], [])
-        self.assertEqual(loading["unexpected_keys"], [])
+        self.assertFalse(loading["missing_keys"])
+        self.assertFalse(loading["unexpected_keys"])
         torch.testing.assert_close(restored.state_dict(), model.state_dict())
 
     def test_vits_safetensors_roundtrip(self):
@@ -82,8 +82,8 @@ class TestLocalModel(unittest.TestCase):
             restored, loading = SynthesizerTrnMs256NSFsid.from_pretrained(
                 directory, local_files_only=True, output_loading_info=True
             )
-        self.assertEqual(loading["missing_keys"], [])
-        self.assertEqual(loading["unexpected_keys"], [])
+        self.assertFalse(loading["missing_keys"])
+        self.assertFalse(loading["unexpected_keys"])
         torch.testing.assert_close(restored.state_dict(), model.state_dict())
 
     def test_legacy_hubert_weight_norm_checkpoint(self):
@@ -102,8 +102,8 @@ class TestLocalModel(unittest.TestCase):
             restored, loading = RVCModel.from_pretrained(
                 directory, local_files_only=True, output_loading_info=True
             )
-        self.assertEqual(loading["missing_keys"], [])
-        self.assertEqual(loading["unexpected_keys"], [])
+        self.assertFalse(loading["missing_keys"])
+        self.assertFalse(loading["unexpected_keys"])
         torch.testing.assert_close(restored.state_dict(), model.state_dict())
 
     def test_local_weights_only_checkpoint(self):

@@ -11,7 +11,7 @@ name = "downloadpytorch"
 [packages]
 torch = {version = "==2.7.1+cu118", index = "downloadpytorch"}
 pyworld = "*"
-transformers = "==4.48.3"
+transformers = "==5.10.1"
 argh = "*"
 safetensors = "*"
 librosa = "*"

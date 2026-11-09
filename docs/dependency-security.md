@@ -1,70 +1,45 @@
 # Dependency compatibility and security
 
-The October 2026 update keeps the HuBERT/RVC implementation on Transformers
-4.48.3. The old deserialization advisories were patched in 4.36.0 and 4.48.0:
-[GHSA-3863-2447-669p](https://github.com/advisories/GHSA-3863-2447-669p),
-[GHSA-qxrp-vhvm-j765](https://github.com/advisories/GHSA-qxrp-vhvm-j765),
-[GHSA-wrfc-pvp9-mr9g](https://github.com/advisories/GHSA-wrfc-pvp9-mr9g), and
-[GHSA-hxxf-235m-72v3](https://github.com/advisories/GHSA-hxxf-235m-72v3).
-4.48.3 is the patch release within that minor series; this is a bounded
-compatibility update, not a claim that all Transformers advisories are cleared.
-The dependency environment and package metadata now require Python 3.11,
-retiring the old Python 3.8/3.9/3.10 test targets.
+The November 2026 environment uses Python 3.11, Transformers 5.10.1 and
+Torch 2.7.1+cu118. Package metadata pins the same Transformers version as
+Pipfile and Pipfile.lock. The CUDA 11.8 index publishes Torch 2.7.1; newer
+Torch versions require a separately selected distribution and CUDA target.
 
-The project directly constructs `HubertForCTC` and its own `RVCModel`, and saves
-model weights and feature extractors. It does not load LightGlue, load a remote
-generation implementation, or save tokenizer/processor chat templates. The
-4.48.3 wheel also validates the attention implementation against built-in names
-and has no remote-kernel loader. The newer broad version alerts
-[GHSA-29pf-2h5f-8g72](https://github.com/advisories/GHSA-29pf-2h5f-8g72),
-[GHSA-fgcw-684q-jj6r](https://github.com/advisories/GHSA-fgcw-684q-jj6r), and
-[GHSA-xrqw-3rrv-vx5w](https://github.com/advisories/GHSA-xrqw-3rrv-vx5w)
-remain visible in version-only scanners. Their reported execution paths are
-not used by these tools. Reassess this decision before adding model families,
-custom code loading, or tokenizer/processor saving.
+CI reads the candidate Torch version from the lock and installs its matching
+official CPU wheel. It applies the remaining locked runtime versions as
+constraints, installs the actual package and UI recipe, checks installed
+Torch/Transformers versions against the lock, and runs pip check. This prevents
+a dependency-only PR from passing tests against older setup.cfg or hard-coded
+Torch selections. Constraints do not constitute a full CUDA Pipenv sync.
 
-`torch.load(weights_only=True)` is used by the VITS converter. Its safety
-bypass was fixed in PyTorch 2.6.0
-([GHSA-53q9-r3pm-6pq6](https://github.com/advisories/GHSA-53q9-r3pm-6pq6)).
-The package now requires at least that version. Pipenv pins 2.7.1+cu118 because
-2.13.0 is not published on the configured CUDA 11.8 index. The optional fairseq
-converter still requires trusted legacy checkpoints and the explicit `--unsafe`
-flag; it is outside the offline smoke test.
+The existing datasets 5.0.1 requires fsspec <=2026.6.0. Preserve that compatible
+record rather than the incompatible 2026.7.0 suggested by dependency automation.
+evaluate requires at least 0.4.6 so a resolver cannot silently fall back to
+obsolete evaluate/datasets releases while keeping another installed dependency.
 
-The upgrade also preserves VITS `weight_g`/`weight_v` checkpoint names while
-allowing Transformers to migrate HuBERT weight normalization names. Without
-that distinction the newer generic loader silently leaves VITS parameters
-uninitialized. The offline tests compare every tensor after local RVC and VITS
-safetensors round trips, including the correct composite RVC configuration.
+Transformers 5 returns empty loading-info sets where 4 returned empty lists.
+The round-trip tests assert that missing/unexpected keys are empty, independent
+of collection type, then compare every saved tensor. They retain normal RVC,
+VITS and legacy HuBERT weight-normalization checkpoint coverage; checkpoint
+formats and model architecture are unchanged. The generated tiny CPU forward
+and local safetensors tests fetch no model weights or datasets.
 
-The UI uses `gradio==6.16.0+esnya.pillow13.1` with Pillow 13.0.0. This local
-maintenance build retains Gradio 6.16.0's frontend protocol and its compatibility
-with Transformers 4.48.3's Hub dependency. It keeps the cookie injection and
-FileExplorer traversal fixes. Official Gradio 6.16.0 and 6.30.0 require
-`pillow<13.0`; the [reviewable recipe](../dependency_patches/gradio/README.md)
-changes one PNG helper to preserve legacy integer clipping explicitly, declares
-`pillow<14.0`, and identifies the resulting distribution with a local version.
-The application selects Pillow 13.0.0 for the current decoder fixes. There is
-no resolver override, and this maintenance build is not an official release.
+The UI continues to use gradio==6.16.0+esnya.pillow13.1 with native Pillow 13.
+The [reviewable recipe](../dependency_patches/gradio/README.md) checks the
+official upstream wheel URL, size, SHA-256, prepared metadata and patch contexts,
+preserves license notices and rebuilds RECORD. It preserves integer-PNG clipping
+explicitly and declares Pillow <14. The local version identifies this as a
+maintenance distribution, not an official Gradio release. Metadata preparation
+is offline; wheel builds fetch only the fixed public artifact or use the
+ESNYA_COMPAT_WHEELHOUSE cache, without executing upstream build code.
 
-The stdlib-only PEP 517 backend checks the exact official wheel URL, size,
-SHA-256, patch contexts and prepared metadata, preserves its license notices,
-and rebuilds RECORD. Metadata preparation is offline. A build downloads only
-the fixed public Gradio wheel, or uses `ESNYA_COMPAT_WHEELHOUSE` for an offline
-wheelhouse. The original wheel's Python/build code is not executed by the build.
-The Pipenv path entry and the UI extra use the same recipe; plain library
-installs continue to exclude the UI. The lock change preserves every unrelated
-package record, including the Torch/CUDA and Transformers selections.
+CPU checks cover the real UI tree with launch disabled, generated WAV input and
+output, conversion callbacks, PNG metadata/clipping, JPEG, TIFF and GIF. They do
+not start a service. Common Voice integration, CUDA inference, microphone/voice
+quality and optional fairseq conversion remain outside these checks. The
+fairseq converter retains its trusted-legacy-checkpoint/explicit --unsafe
+requirement. No model or dataset licence is accepted by the offline workflow.
 
-The optional UI checks construct the real component tree with launch disabled,
-exercise generated WAV input/output and audio callbacks, and round-trip PNG,
-integer PNG, JPEG, TIFF and multi-frame GIF fixtures. They load no pretrained
-model and start no web server. Pillow 13 compatibility of these paths does not
-establish the applicability or absence of every Gradio/Transformers advisory.
-
-The default CI tests use locally constructed tiny models, generated tensor
-checkpoints, and local safetensors round trips. They require no model weights,
-Hub access, or dataset license acceptance. The existing Common Voice feature
-extraction suite remains an explicit integration test and is not invoked by
-the offline workflow. A passing CPU test does not validate CUDA, microphone
-devices, fairseq conversion, or live voice quality.
+This compatibility validation is not a fresh universal vulnerability scan.
+The earlier advisory applicability analysis should be reassessed before adding
+new model families, remote custom code or different checkpoint-loading paths.
