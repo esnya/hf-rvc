@@ -3,15 +3,10 @@ url = "https://pypi.org/simple"
 verify_ssl = true
 name = "pypi"
 
-[[source]]
-url = "https://download.pytorch.org/whl/cu118"
-verify_ssl = true
-name = "downloadpytorch"
-
 [packages]
-torch = {version = "==2.13.0", index = "downloadpytorch"}
+torch = {version = "==2.13.0", index = "pypi"}
 pyworld = "*"
-transformers = "==4.48.3"
+transformers = "==5.10.1"
 argh = "*"
 safetensors = "*"
 librosa = "*"
