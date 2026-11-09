@@ -12,9 +12,11 @@ The original implementation of the Retrieval-based-Voice-Conversion (RVC) can be
 
 Python 3.11 or newer is required. The dependency smoke tests run on Python 3.11.
 
-The Pipenv environment uses PyTorch 2.7.1 with CUDA 11.8, the last published
-PyTorch release on that CUDA index. For CPU-only use, install the corresponding
-2.7.1 CPU wheel from the official PyTorch index before installing this package.
+The Pipenv environment selects PyTorch 2.13.0 from PyPI, whose Linux wheels
+use CUDA 13. It no longer targets CUDA 11.8; verify driver and GPU support before
+using this environment on a GPU. CPU-only use should install the official
+2.13.0 CPU wheel before installing this package. Offline CI exercises this
+exact release with the CPU wheel; GPU inference remains unverified.
 
 See [dependency security notes](docs/dependency-security.md) for compatibility
 limits and the maintained Gradio/Pillow build.

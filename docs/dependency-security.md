@@ -1,9 +1,11 @@
 # Dependency compatibility and security
 
 The November 2026 environment uses Python 3.11, Transformers 5.10.1 and
-Torch 2.7.1+cu118. Package metadata pins the same Transformers version as
-Pipfile and Pipfile.lock. The CUDA 11.8 index publishes Torch 2.7.1; newer
-Torch versions require a separately selected distribution and CUDA target.
+Torch 2.13.0 from PyPI. Package metadata pins the same Transformers version as
+Pipfile and Pipfile.lock. The Linux PyPI Torch 2.13.0 wheels select CUDA 13 dependencies. The obsolete
+CUDA 11.8 source and its dependency records are removed rather than requesting
+a release absent from that index. CPU API/checkpoint/UI verification does not
+validate CUDA 13 driver support or GPU inference.
 
 CI reads the candidate Torch version from the lock and installs its matching
 official CPU wheel. It applies the remaining locked runtime versions as
